@@ -127,7 +127,17 @@ export function scheduleDependencies(tasks: GanttTask[], calendar: WorkCalendarC
 export function rollupParentDates(tasks: GanttTask[], calendar: WorkCalendarConfig = defaultWorkCalendar): GanttTask[] {
   const scheduled = scheduleDependencies(tasks, calendar);
 
-  const parentIds = new Set(scheduled.filter(t => t.parentId !== null).map(t => t.parentId!));
+  // One-time baseline initialization: when baseline dates have never been set
+  // (undefined), capture the task's current Start/End as the original plan.
+  // Explicitly cleared values (null) stay empty, and later Start/End changes
+  // never overwrite an initialized baseline. Parent baselines are overwritten
+  // below by the child rollup, so this fallback only sticks for leaf tasks.
+  for (const t of scheduled) {
+    if (t.baselineStart === undefined) t.baselineStart = new Date(t.start);
+    if (t.baselineEnd === undefined) t.baselineEnd = new Date(t.end);
+  }
+
+  const parentIds
   const parentList = scheduled.filter(t => parentIds.has(t.id));
   parentList.sort((a, b) => b.level - a.level);
 
