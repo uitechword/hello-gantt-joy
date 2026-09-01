@@ -1,0 +1,146 @@
+/* Isolated styles for the "By CRUD" Gantt changes page. */
+
+.gcv-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border: 1px solid #c8d2dd;
+  border-radius: 6px;
+  background: #fff;
+  color: #1f3247;
+  cursor: pointer;
+}
+.gcv-btn:hover { background: #eef3f8; }
+
+.gcv-page {
+  position: fixed;
+  inset: 0;
+  z-index: 3200;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.gcv-page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e3e9ef;
+}
+.gcv-page-title { margin: 0; font-size: 17px; font-weight: 600; color: #16324f; }
+.gcv-close {
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: #64748b;
+  padding: 2px 8px;
+}
+.gcv-close:hover { color: #16324f; }
+
+.gcv-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 18px 0;
+  border-bottom: 1px solid #e3e9ef;
+  flex-wrap: wrap;
+}
+.gcv-tab {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  color: #56687c;
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+.gcv-tab:hover { background: #f1f5f9; }
+.gcv-tab-active {
+  background: #fff;
+  color: #16324f;
+  border-color: #d9e1ea;
+  border-bottom: 1px solid #fff;
+}
+.gcv-tab-count { color: #7b8b9c; font-weight: 400; }
+
+.gcv-page-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 18px 18px;
+}
+
+.gcv-table-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid #e3e9ef;
+  border-radius: 6px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.gcv-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  min-width: 100%;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.gcv-table th,
+.gcv-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid #eef2f6;
+  border-right: 1px solid #eef2f6;
+  text-align: left;
+  vertical-align: top;
+}
+.gcv-table th:last-child,
+.gcv-table td:last-child { border-right: none; }
+.gcv-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f4f7fa;
+  color: #33465c;
+  font-weight: 600;
+  border-bottom: 1px solid #d9e1ea;
+}
+.gcv-table tbody tr:hover { background: #f1f7ff; }
+
+.gcv-id {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: #16324f;
+}
+.gcv-empty-cell { color: #b6c0cb; }
+
+.gcv-changed { background: #e8f5e9; }
+
+.gcv-row-deleted { background: #fdecec; }
+.gcv-row-deleted:hover { background: #fbe0e0; }
+
+.gcv-empty {
+  padding: 48px 16px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+  border: 1px solid #e3e9ef;
+  border-radius: 6px;
+}
+
+@media (max-width: 640px) {
+  .gcv-page-head { padding: 12px; }
+  .gcv-page-body { padding: 10px 12px 12px; }
+  .gcv-table { font-size: 11px; }
+}

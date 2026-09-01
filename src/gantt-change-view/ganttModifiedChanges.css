@@ -1,0 +1,127 @@
+/* Isolated styles for the "View Only Modified Changes" feature. */
+
+.gmc-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border: 1px solid #c8d2dd;
+  border-radius: 6px;
+  background: #fff;
+  color: #1f3247;
+  cursor: pointer;
+}
+.gmc-btn:hover { background: #eef3f8; }
+
+.gmc-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 27, 41, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 16px;
+}
+
+.gmc-modal {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  width: min(1200px, 100%);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.gmc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e3e9ef;
+}
+.gmc-title { font-size: 15px; font-weight: 600; color: #16324f; margin: 0; }
+.gmc-count { font-size: 12px; color: #64748b; margin-left: 8px; font-weight: 400; }
+.gmc-close {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: #64748b;
+  padding: 2px 6px;
+}
+.gmc-close:hover { color: #16324f; }
+
+.gmc-body {
+  overflow: auto;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+}
+
+.gmc-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  min-width: 100%;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.gmc-table th,
+.gmc-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid #eef2f6;
+  border-right: 1px solid #eef2f6;
+  text-align: left;
+  vertical-align: top;
+}
+.gmc-table th:last-child,
+.gmc-table td:last-child { border-right: none; }
+.gmc-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f4f7fa;
+  color: #33465c;
+  font-weight: 600;
+  border-bottom: 1px solid #d9e1ea;
+}
+.gmc-table tbody tr:nth-child(even) { background: #fbfcfd; }
+.gmc-table tbody tr:hover { background: #f1f7ff; }
+
+.gmc-id {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: #16324f;
+}
+.gmc-empty-cell { color: #b6c0cb; }
+
+.gmc-changed {
+  background: #e8f5e9;
+}
+
+.gmc-new-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: #e3f6e9;
+  color: #1c7a41;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.gmc-empty {
+  padding: 40px 16px;
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .gmc-modal { max-height: 92vh; }
+  .gmc-table { font-size: 11px; }
+}
