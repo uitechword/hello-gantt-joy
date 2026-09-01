@@ -1,0 +1,242 @@
+/* Scoped plain CSS for the Gantt Change Review feature */
+
+.gcr-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gcr-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(120, 130, 150, 0.35);
+  background: #fff;
+  color: #1f2a37;
+  cursor: pointer;
+}
+.gcr-btn:hover { background: #f1f5f9; }
+.gcr-btn-primary { background: #2563eb; border-color: #2563eb; color: #fff; }
+.gcr-btn-primary:hover { background: #1d4ed8; }
+
+/* ---- Modal shell ---- */
+.gcr-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 9999;
+}
+
+.gcr-modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.3);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1100px;
+  max-height: 86vh;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #1f2a37;
+}
+.gcr-modal-wide { max-width: 1180px; }
+
+.gcr-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.gcr-modal-title { font-size: 17px; font-weight: 650; margin: 0; }
+.gcr-modal-sub { font-size: 12.5px; color: #6b7280; margin-top: 3px; }
+
+.gcr-close {
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.gcr-close:hover { background: #f1f5f9; color: #111827; }
+
+.gcr-modal-body { overflow: auto; }
+.gcr-summary-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.gcr-empty {
+  text-align: center;
+  padding: 48px 16px;
+  color: #6b7280;
+}
+
+/* ---- Change summary table (two-row pairs) ---- */
+.gcr-table-wrap {
+  overflow: auto;
+  flex: 1;
+}
+
+.gcr-summary-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content;
+  min-width: 100%;
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+.gcr-summary-table th,
+.gcr-summary-table td {
+  padding: 5px 10px;
+  text-align: left;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.gcr-summary-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #475569;
+}
+
+.gcr-summary-table th.gcr-col-task {
+  left: 0;
+  z-index: 3;
+  border-right: 1px solid #e5e7eb;
+  min-width: 92px;
+}
+.gcr-col-type { min-width: 78px; }
+
+.gcr-cell-task {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  min-width: 92px;
+}
+
+.gcr-task-id { display: block; font-weight: 700; font-size: 13px; color: #1f2a37; }
+
+.gcr-task-status {
+  display: inline-block;
+  margin-top: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+.gcr-status-modified { background: #e0e7ff; color: #3730a3; }
+.gcr-status-added { background: #dcfce7; color: #166534; }
+.gcr-status-removed { background: #fee2e2; color: #991b1b; }
+
+.gcr-cell-type {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.gcr-cell-value { min-width: 120px; color: #64748b; }
+
+.gcr-row-old td { background: #fdf6f6; color: #7f1d1d; }
+.gcr-row-new td { background: #f5fcf7; color: #14532d; border-bottom: 1px solid #e5e7eb; }
+.gcr-row-old .gcr-cell-type { color: #b91c1c; }
+.gcr-row-new .gcr-cell-type { color: #15803d; }
+
+.gcr-row-old .gcr-cell-value.gcr-changed {
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 600;
+}
+.gcr-row-new .gcr-cell-value.gcr-changed {
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 700;
+}
+
+/* ---- JSON compare ---- */
+.gcr-diff-head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #475569;
+}
+.gcr-diff-head > div { padding: 8px 14px; }
+.gcr-diff-head > div + div { border-left: 1px solid #e5e7eb; }
+
+.gcr-diff-body { overflow: auto; flex: 1; }
+.gcr-diff-table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.gcr-diff-table td { vertical-align: top; padding: 0; }
+.gcr-num {
+  text-align: right;
+  padding: 0 8px;
+  color: #9ca3af;
+  background: #fafafa;
+  user-select: none;
+  border-right: 1px solid #eef2f7;
+}
+.gcr-code { white-space: pre; padding: 0 10px; }
+.gcr-pane-split { border-left: 1px solid #e5e7eb; }
+.gcr-line-added { background: #e6ffed; }
+.gcr-line-removed { background: #ffeef0; }
+.gcr-line-empty { background: #fafbfc; }
+
+.gcr-legend {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  font-size: 12px;
+  color: #6b7280;
+  padding: 8px 20px;
+  border-top: 1px solid #e5e7eb;
+}
+.gcr-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 5px;
+  vertical-align: -2px;
+}
+.gcr-swatch-removed { background: #ffeef0; }
+.gcr-swatch-added { background: #e6ffed; }
+.gcr-swatch-same { background: #fff; border: 1px solid #e5e7eb; }
+
+@media (max-width: 720px) {
+  .gcr-overlay { padding: 10px; }
+  .gcr-summary-table th,
+  .gcr-summary-table td { padding: 6px 8px; }
+}
