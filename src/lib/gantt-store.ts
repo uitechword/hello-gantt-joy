@@ -137,7 +137,7 @@ export function rollupParentDates(tasks: GanttTask[], calendar: WorkCalendarConf
     if (t.baselineEnd === undefined) t.baselineEnd = new Date(t.end);
   }
 
-  const parentIds = new Set(scheduled.filter(t => t.parentId !== null).map(t => t.parentId!));
+  const parentIds = new Set<number>(scheduled.filter(t => t.parentId !== null).map(t => t.parentId!));
   const parentList = scheduled.filter(t => parentIds.has(t.id));
   parentList.sort((a, b) => b.level - a.level);
 
