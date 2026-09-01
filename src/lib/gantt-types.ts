@@ -24,7 +24,13 @@ export interface GanttTask {
   parentId: number | null;
   expanded: boolean;
   level: number;
+  // Informational tracking dates — never affect scheduling or dependencies
+  baselineStart?: Date | null;
+  baselineEnd?: Date | null;
+  actualStart?: Date | null;
+  actualEnd?: Date | null;
 }
+
 
 export interface FlatTask extends GanttTask {
   hasChildren: boolean;
