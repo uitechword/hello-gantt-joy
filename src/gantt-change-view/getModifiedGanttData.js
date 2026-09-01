@@ -15,6 +15,10 @@ export const FIELD_LABELS = {
   type: 'Task Type',
   start: 'Start Date',
   end: 'End Date',
+  baselineStart: 'Baseline Start Date',
+  baselineEnd: 'Baseline End Date',
+  actualStart: 'Actual Start Date',
+  actualEnd: 'Actual End Date',
   duration: 'Duration',
   dependencies: 'Dependency',
   progress: 'Progress',
@@ -27,7 +31,7 @@ export const FIELD_LABELS = {
 };
 
 const FIELD_ORDER = [
-  'name', 'type', 'start', 'end', 'duration', 'dependencies',
+  'name', 'type', 'start', 'end', 'baselineStart', 'baselineEnd', 'actualStart', 'actualEnd', 'duration', 'dependencies',
   'progress', 'resources', 'assignee', 'parentId', 'level', 'milestone',
   'notes',
 ];
@@ -50,7 +54,10 @@ function prettyDate(value) {
 }
 
 function isDateField(field, value) {
-  return field === 'start' || field === 'end' || value instanceof Date;
+  return field === 'start' || field === 'end' ||
+    field === 'baselineStart' || field === 'baselineEnd' ||
+    field === 'actualStart' || field === 'actualEnd' ||
+    value instanceof Date;
 }
 
 function depToString(dep) {

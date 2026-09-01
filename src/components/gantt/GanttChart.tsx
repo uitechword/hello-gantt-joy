@@ -383,7 +383,34 @@ export function GanttChart() {
           if (isNaN(dur) || dur < 0) return t;
           return { ...t, end: addWorkingDays(t.start, dur, workCalendar) };
         }
+        case 'baselineStart':
+        case 'baselineEnd':
+        case 'actualStart':
+        case 'actualEnd': {
+          // Informational tracking dates: never touch start/end, dependencies or scheduling
+          if (!value) return { ...t, [field]: null };
+          const d = new Date(value + 'T00:00:00');
+          if (isNaN(d.getTime())) return t;
+          if (field === 'baselineEnd' && t.baselineStart instanceof Date && d < t.baselineStart) {
+            toast({ title: 'Invalid date', description: 'Baseline End Date must be on or after Baseline Start Date.', variant: 'destructive' });
+            return t;
+          }
+          if (field === 'baselineStart' && t.baselineEnd instanceof Date && d > t.baselineEnd) {
+            toast({ title: 'Invalid date', description: 'Baseline Start Date must be on or before Baseline End Date.', variant: 'destructive' });
+            return t;
+          }
+          if (field === 'actualEnd' && t.actualStart instanceof Date && d < t.actualStart) {
+            toast({ title: 'Invalid date', description: 'Actual End Date must be on or after Actual Start Date.', variant: 'destructive' });
+            return t;
+          }
+          if (field === 'actualStart' && t.actualEnd instanceof Date && d > t.actualEnd) {
+            toast({ title: 'Invalid date', description: 'Actual Start Date must be on or before Actual End Date.', variant: 'destructive' });
+            return t;
+          }
+          return { ...t, [field]: d };
+        }
         case 'progress': { const p = parseInt(value); if (isNaN(p)) return t; return { ...t, progress: Math.max(0, Math.min(100, p)) }; }
+
         case 'predecessors': {
           const newDeps = parsePredecessorString(value);
           if (hasCircularDependency(prev, id, newDeps)) {

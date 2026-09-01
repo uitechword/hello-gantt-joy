@@ -131,6 +131,21 @@ export function rollupParentDates(tasks: GanttTask[], calendar: WorkCalendarConf
   const parentList = scheduled.filter(t => parentIds.has(t.id));
   parentList.sort((a, b) => b.level - a.level);
 
+  const trackingMin = (children: GanttTask[], field: 'baselineStart' | 'actualStart') => {
+    const times = children
+      .map(c => c[field])
+      .filter((d): d is Date => d instanceof Date && !isNaN(d.getTime()))
+      .map(d => d.getTime());
+    return times.length ? new Date(Math.min(...times)) : null;
+  };
+  const trackingMax = (children: GanttTask[], field: 'baselineEnd' | 'actualEnd') => {
+    const times = children
+      .map(c => c[field])
+      .filter((d): d is Date => d instanceof Date && !isNaN(d.getTime()))
+      .map(d => d.getTime());
+    return times.length ? new Date(Math.max(...times)) : null;
+  };
+
   for (const parent of parentList) {
     const children = scheduled.filter(t => t.parentId === parent.id);
     if (children.length === 0) continue;
@@ -143,7 +158,14 @@ export function rollupParentDates(tasks: GanttTask[], calendar: WorkCalendarConf
     parent.start = minStart;
     parent.end = maxEnd;
     parent.progress = totalDuration > 0 ? Math.round(weightedProgress / totalDuration) : 0;
+
+    // Independent tracking-date rollup (deepest levels first, so it is recursive)
+    parent.baselineStart = trackingMin(children, 'baselineStart');
+    parent.baselineEnd = trackingMax(children, 'baselineEnd');
+    parent.actualStart = trackingMin(children, 'actualStart');
+    parent.actualEnd = trackingMax(children, 'actualEnd');
   }
+
 
   return scheduled;
 }
