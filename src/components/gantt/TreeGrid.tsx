@@ -31,17 +31,26 @@ export function TreeGrid({ tasks, resources, selectedTaskIds, onSelectTask, onTo
     { key: 'name', label: 'Task Name', width: 200 },
     { key: 'start', label: 'Start Date', width: 110 },
     { key: 'end', label: 'End Date', width: 110 },
+    { key: 'baselineStart', label: 'Baseline Start Date', width: 120 },
+    { key: 'baselineEnd', label: 'Baseline End Date', width: 120 },
+    { key: 'actualStart', label: 'Actual Start Date', width: 120 },
+    { key: 'actualEnd', label: 'Actual End Date', width: 120 },
     { key: 'duration', label: 'Duration', width: 72 },
     { key: 'progress', label: 'Progress', width: 72 },
     { key: 'resources', label: 'Resources', width: 120 },
     { key: 'predecessors', label: 'Predecessors', width: 110 },
   ];
 
+  const trackingFields = ['baselineStart', 'baselineEnd', 'actualStart', 'actualEnd'];
+  const dateFields = ['start', 'end', ...trackingFields];
+
   const totalWidth = columns.reduce((s, c) => s + c.width, 0);
 
   function startEdit(id: number, field: string) {
     const task = visibleTasks.find(t => t.id === id);
-    if (!task || task.hasChildren && ['start', 'end', 'duration'].includes(field)) return;
+    if (!task) return;
+    // Parent rows: scheduling and tracking dates are derived from children
+    if (task.hasChildren && ['start', 'end', 'duration', ...trackingFields].includes(field)) return;
     setEditingCell({ id, field });
     setTimeout(() => inputRef.current?.focus(), 0);
   }
@@ -59,6 +68,13 @@ export function TreeGrid({ tasks, resources, selectedTaskIds, onSelectTask, onTo
       case 'name': return task.name;
       case 'start': return toDateString(task.start);
       case 'end': return toDateString(task.end);
+      case 'baselineStart':
+      case 'baselineEnd':
+      case 'actualStart':
+      case 'actualEnd': {
+        const d = task[key as 'baselineStart'];
+        return d instanceof Date && !isNaN(d.getTime()) ? toDateString(d) : '';
+      }
       case 'duration': return `${getDuration(task.start, task.end)}d`;
       case 'progress': return `${task.progress}%`;
       case 'resources': return task.resources.map(rid => resources.find(r => r.id === rid)?.name || rid).join(', ');
@@ -71,11 +87,19 @@ export function TreeGrid({ tasks, resources, selectedTaskIds, onSelectTask, onTo
     switch (key) {
       case 'start': return formatDate(task.start);
       case 'end': return formatDate(task.end);
+      case 'baselineStart':
+      case 'baselineEnd':
+      case 'actualStart':
+      case 'actualEnd': {
+        const d = task[key as 'baselineStart'];
+        return d instanceof Date && !isNaN(d.getTime()) ? formatDate(d) : '—';
+      }
       default: return getCellValue(task, key);
     }
   }
 
-  const editableFields = ['name', 'start', 'end', 'predecessors'];
+  const editableFields = ['name', 'start', 'end', 'predecessors', ...trackingFields];
+
 
   return (
     <div className="treegrid gantt-scrollbar">
