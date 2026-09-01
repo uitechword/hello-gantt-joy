@@ -205,7 +205,7 @@ export function TreeGrid({ tasks, resources, selectedTaskIds, onSelectTask, onTo
                     <input
                       ref={inputRef}
                       defaultValue={getCellValue(task, col.key)}
-                      type={['start', 'end'].includes(col.key) ? 'date' : 'text'}
+                      type={dateFields.includes(col.key) ? 'date' : 'text'}
                       onBlur={e => commitEdit(e.target.value)}
                       onKeyDown={e => { if (e.key === 'Enter') commitEdit((e.target as HTMLInputElement).value); if (e.key === 'Escape') setEditingCell(null); }}
                       className="treegrid-inline-input"
