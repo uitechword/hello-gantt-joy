@@ -26,11 +26,15 @@ export function TimelineChart({
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState<{ taskId: number; mode: 'move' | 'resize'; startX: number; origStart: Date; origEnd: Date } | null>(null);
-  const [tooltip, setTooltip] = useState<{ x: number; y: number; task: FlatTask } | null>(null);
+  const [tooltip, setTooltip] = useState<{ x: number; y: number; task: FlatTask; kind: 'planned' | 'baseline' | 'actual' } | null>(null);
 
   const visibleTasks = tasks.filter(t => t.visible);
 
-  const allDates = visibleTasks.flatMap(t => [t.start, t.end]);
+  const isValidDate = (d: Date | null | undefined): d is Date => d instanceof Date && !isNaN(d.getTime());
+
+  const allDates = visibleTasks.flatMap(t =>
+    [t.start, t.end, t.baselineStart, t.baselineEnd, t.actualStart, t.actualEnd].filter(isValidDate)
+  );
   if (allDates.length === 0) return <div className="timeline-container" />;
 
   const minDate = new Date(Math.min(...allDates.map(d => d.getTime())));
@@ -146,6 +150,52 @@ export function TimelineChart({
     );
   }
 
+  // Read-only tracking bars (baseline/actual). No drag/resize/scheduling handlers.
+  const renderTrackingBar = (
+    task: FlatTask,
+    start: Date | null | undefined,
+    end: Date | null | undefined,
+    barY: number,
+    kind: 'baseline' | 'actual',
+  ) => {
+    if (!isValidDate(start) || !isValidDate(end) || end < start) return null;
+    const bx = dateToX(start);
+    const bw = Math.max(dateToX(end) - bx, 6);
+    const fill = kind === 'baseline' ? 'var(--gantt-bar-baseline)' : 'var(--gantt-bar-actual)';
+    const label = kind === 'baseline' ? 'Baseline' : 'Actual';
+    if (start.getTime() === end.getTime()) {
+      // Milestone-style compact marker for zero-duration tracking dates
+      const cx = bx + 3;
+      const cy = barY + 2.5;
+      return (
+        <polygon
+          key={`${kind}-${task.id}`}
+          points={`${cx},${cy - 4} ${cx + 4},${cy} ${cx},${cy + 4} ${cx - 4},${cy}`}
+          fill={fill}
+          style={{ cursor: 'default' }}
+          onMouseEnter={e => { if (!dragging) setTooltip({ x: e.clientX, y: e.clientY, task, kind }); }}
+          onMouseMove={e => { if (!dragging && tooltip?.task.id === task.id && tooltip.kind === kind) setTooltip({ x: e.clientX, y: e.clientY, task, kind }); }}
+          onMouseLeave={() => setTooltip(null)}
+        >
+          <title>{label}</title>
+        </polygon>
+      );
+    }
+    return (
+      <rect
+        key={`${kind}-${task.id}`}
+        x={bx} y={barY} width={bw} height={5} rx={2}
+        fill={fill}
+        style={{ cursor: 'default' }}
+        onMouseEnter={e => { if (!dragging) setTooltip({ x: e.clientX, y: e.clientY, task, kind }); }}
+        onMouseMove={e => { if (!dragging && tooltip?.task.id === task.id && tooltip.kind === kind) setTooltip({ x: e.clientX, y: e.clientY, task, kind }); }}
+        onMouseLeave={() => setTooltip(null)}
+      >
+        <title>{label}</title>
+      </rect>
+    );
+  };
+
   return (
     <div ref={containerRef} className="timeline-container gantt-scrollbar">
       <svg ref={svgRef} width={totalWidth} height={totalHeight + rowHeight * 2} style={{ userSelect: 'none' }}>
@@ -225,8 +275,11 @@ export function TimelineChart({
             const x = dateToX(task.start);
             const width = Math.max(dateToX(task.end) - x, dayWidth * 0.5);
             const y = idx * rowHeight;
-            const barHeight = task.hasChildren ? 8 : 20;
-            const barY = y + (rowHeight - barHeight) / 2;
+            // Three stacked slots per row: Planned (top, primary), Baseline (middle), Actual (bottom)
+            const barHeight = task.hasChildren ? 6 : 12;
+            const barY = y + 3;
+            const baselineY = y + rowHeight - 14;
+            const actualY = y + rowHeight - 7;
             const isSelected = selectedTaskIds.has(task.id);
             const cpm = cpmResults.get(task.id);
             const isCritical = showCriticalPath && (cpm?.isCritical ?? false);
@@ -239,6 +292,8 @@ export function TimelineChart({
                   <rect x={x + width - 3} y={barY} width={3} height={barHeight + 4} fill="var(--gantt-bar-parent)" />
                   <rect x={x} y={barY} width={width * (task.progress / 100)} height={barHeight} rx={1} fill="var(--gantt-bar-progress)" opacity={0.5} />
                   {isSelected && <rect x={x - 1} y={barY - 1} width={width + 2} height={barHeight + 2} rx={2} fill="none" stroke="var(--ring)" strokeWidth={2} />}
+                  {renderTrackingBar(task, task.baselineStart, task.baselineEnd, baselineY, 'baseline')}
+                  {renderTrackingBar(task, task.actualStart, task.actualEnd, actualY, 'actual')}
                 </g>
               );
             }
@@ -255,8 +310,8 @@ export function TimelineChart({
                   onMouseDown={e => handleMouseDown(e, task.id, 'move')}
                   onClick={() => onSelectTask(task.id)}
                   onContextMenu={e => onContextMenu(e, task.id)}
-                  onMouseEnter={e => { if (!dragging) setTooltip({ x: e.clientX, y: e.clientY, task }); }}
-                  onMouseMove={e => { if (!dragging && tooltip?.task.id === task.id) setTooltip({ x: e.clientX, y: e.clientY, task }); }}
+                  onMouseEnter={e => { if (!dragging) setTooltip({ x: e.clientX, y: e.clientY, task, kind: 'planned' }); }}
+                  onMouseMove={e => { if (!dragging && tooltip?.task.id === task.id) setTooltip({ x: e.clientX, y: e.clientY, task, kind: 'planned' }); }}
                   onMouseLeave={() => setTooltip(null)}
                 />
                 {isCritical && (
@@ -311,42 +366,51 @@ export function TimelineChart({
                 {isSelected && (
                   <rect x={x - 1} y={barY - 1} width={width + 2} height={barHeight + 2} rx={4} fill="none" stroke="var(--ring)" strokeWidth={2} />
                 )}
+                {renderTrackingBar(task, task.baselineStart, task.baselineEnd, baselineY, 'baseline')}
+                {renderTrackingBar(task, task.actualStart, task.actualEnd, actualY, 'actual')}
               </g>
             );
           })}
         </g>
       </svg>
 
-      {tooltip && !dragging && (
+      {tooltip && !dragging && (() => {
+        const tipStart = tooltip.kind === 'baseline' ? tooltip.task.baselineStart : tooltip.kind === 'actual' ? tooltip.task.actualStart : tooltip.task.start;
+        const tipEnd = tooltip.kind === 'baseline' ? tooltip.task.baselineEnd : tooltip.kind === 'actual' ? tooltip.task.actualEnd : tooltip.task.end;
+        const kindLabel = tooltip.kind === 'baseline' ? 'Baseline' : tooltip.kind === 'actual' ? 'Actual' : 'Planned';
+        return (
         <div
           className="gantt-tooltip"
           style={{ left: tooltip.x + 14, top: tooltip.y - 10 }}
         >
-          <div className="gantt-tooltip-title">{tooltip.task.name}</div>
+          <div className="gantt-tooltip-title">{tooltip.task.name} — {kindLabel}</div>
           <div className="gantt-tooltip-row">
             <span className="gantt-tooltip-label">Start:</span>
-            <span>{formatDate(tooltip.task.start)}</span>
+            <span>{isValidDate(tipStart) ? formatDate(tipStart) : '—'}</span>
           </div>
           <div className="gantt-tooltip-row">
             <span className="gantt-tooltip-label">End:</span>
-            <span>{formatDate(tooltip.task.end)}</span>
+            <span>{isValidDate(tipEnd) ? formatDate(tipEnd) : '—'}</span>
           </div>
           <div className="gantt-tooltip-row">
             <span className="gantt-tooltip-label">Duration:</span>
-            <span>{getDuration(tooltip.task.start, tooltip.task.end)}d</span>
+            <span>{isValidDate(tipStart) && isValidDate(tipEnd) ? `${getDuration(tipStart, tipEnd)}d` : '—'}</span>
           </div>
-          <div className="gantt-tooltip-row">
-            <span className="gantt-tooltip-label">Progress:</span>
-            <span>{tooltip.task.progress}%</span>
-          </div>
-          {tooltip.task.resources.length > 0 && (
+          {tooltip.kind === 'planned' && (
+            <div className="gantt-tooltip-row">
+              <span className="gantt-tooltip-label">Progress:</span>
+              <span>{tooltip.task.progress}%</span>
+            </div>
+          )}
+          {tooltip.kind === 'planned' && tooltip.task.resources.length > 0 && (
             <div className="gantt-tooltip-row">
               <span className="gantt-tooltip-label">Resources:</span>
               <span>{tooltip.task.resources.map(rid => resources.find(r => r.id === rid)?.name || rid).join(', ')}</span>
             </div>
           )}
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

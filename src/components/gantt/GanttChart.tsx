@@ -515,6 +515,12 @@ export function GanttChart() {
         onOpenAIPlanner={() => setShowAIPlanner(true)}
       />
 
+      <div className="gantt-legend">
+        <span className="gantt-legend-item"><span className="gantt-legend-swatch" style={{ background: 'var(--gantt-bar)' }} /> Planned</span>
+        <span className="gantt-legend-item"><span className="gantt-legend-swatch" style={{ background: 'var(--gantt-bar-baseline)' }} /> Baseline</span>
+        <span className="gantt-legend-item"><span className="gantt-legend-swatch" style={{ background: 'var(--gantt-bar-actual)' }} /> Actual</span>
+      </div>
+
       <div className="gantt-content">
         <div ref={treeScrollRef} style={{ width: dividerX, overflow: 'auto', flexShrink: 0 }} className="gantt-scrollbar">
           <TreeGrid

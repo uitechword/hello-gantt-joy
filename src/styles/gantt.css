@@ -29,6 +29,8 @@
   --gantt-header-fg: #e8ecf1;
   --gantt-bar: #3b7dd8;
   --gantt-bar-progress: #1e5aa8;
+  --gantt-bar-baseline: #9aa7b8;
+  --gantt-bar-actual: #38a169;
   --gantt-bar-parent: #3d4f63;
   --gantt-milestone: #e8943a;
   --gantt-grid-line: #e8ecf1;
@@ -1174,3 +1176,17 @@ body {
 .ai-list-warn li { color: #b45309; }
 
 .ai-action-row { display: flex; gap: 8px; justify-content: flex-end; padding-top: 8px; border-top: 1px solid var(--border-color); }
+
+.gantt-legend {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 2px 10px;
+  font-size: 11px;
+  color: var(--gantt-header);
+  border-bottom: 1px solid var(--gantt-grid-line);
+  background: #fafbfc;
+  line-height: 1.4;
+}
+.gantt-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.gantt-legend-swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
