@@ -374,19 +374,23 @@ export function TimelineChart({
         </g>
       </svg>
 
-      {tooltip && !dragging && (
+      {tooltip && !dragging && (() => {
+        const tipStart = tooltip.kind === 'baseline' ? tooltip.task.baselineStart : tooltip.kind === 'actual' ? tooltip.task.actualStart : tooltip.task.start;
+        const tipEnd = tooltip.kind === 'baseline' ? tooltip.task.baselineEnd : tooltip.kind === 'actual' ? tooltip.task.actualEnd : tooltip.task.end;
+        const kindLabel = tooltip.kind === 'baseline' ? 'Baseline' : tooltip.kind === 'actual' ? 'Actual' : 'Planned';
+        return (
         <div
           className="gantt-tooltip"
           style={{ left: tooltip.x + 14, top: tooltip.y - 10 }}
         >
-          <div className="gantt-tooltip-title">{tooltip.task.name}</div>
+          <div className="gantt-tooltip-title">{tooltip.task.name} — {kindLabel}</div>
           <div className="gantt-tooltip-row">
             <span className="gantt-tooltip-label">Start:</span>
-            <span>{formatDate(tooltip.task.start)}</span>
+            <span>{isValidDate(tipStart) ? formatDate(tipStart) : '—'}</span>
           </div>
           <div className="gantt-tooltip-row">
             <span className="gantt-tooltip-label">End:</span>
-            <span>{formatDate(tooltip.task.end)}</span>
+            <span>{isValidDate(tipEnd) ? formatDate(tipEnd) : '—'}</span>
           </div>
           <div className="gantt-tooltip-row">
             <span className="gantt-tooltip-label">Duration:</span>
