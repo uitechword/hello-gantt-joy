@@ -29,6 +29,8 @@
   --gantt-header-fg: #e8ecf1;
   --gantt-bar: #3b7dd8;
   --gantt-bar-progress: #1e5aa8;
+  --gantt-bar-baseline: #9aa7b8;
+  --gantt-bar-actual: #38a169;
   --gantt-bar-parent: #3d4f63;
   --gantt-milestone: #e8943a;
   --gantt-grid-line: #e8ecf1;
