@@ -150,6 +150,52 @@ export function TimelineChart({
     );
   }
 
+  // Read-only tracking bars (baseline/actual). No drag/resize/scheduling handlers.
+  const renderTrackingBar = (
+    task: FlatTask,
+    start: Date | null | undefined,
+    end: Date | null | undefined,
+    barY: number,
+    kind: 'baseline' | 'actual',
+  ) => {
+    if (!isValidDate(start) || !isValidDate(end) || end < start) return null;
+    const bx = dateToX(start);
+    const bw = Math.max(dateToX(end) - bx, 6);
+    const fill = kind === 'baseline' ? 'var(--gantt-bar-baseline)' : 'var(--gantt-bar-actual)';
+    const label = kind === 'baseline' ? 'Baseline' : 'Actual';
+    if (start.getTime() === end.getTime()) {
+      // Milestone-style compact marker for zero-duration tracking dates
+      const cx = bx + 3;
+      const cy = barY + 2.5;
+      return (
+        <polygon
+          key={`${kind}-${task.id}`}
+          points={`${cx},${cy - 4} ${cx + 4},${cy} ${cx},${cy + 4} ${cx - 4},${cy}`}
+          fill={fill}
+          style={{ cursor: 'default' }}
+          onMouseEnter={e => { if (!dragging) setTooltip({ x: e.clientX, y: e.clientY, task, kind }); }}
+          onMouseMove={e => { if (!dragging && tooltip?.task.id === task.id && tooltip.kind === kind) setTooltip({ x: e.clientX, y: e.clientY, task, kind }); }}
+          onMouseLeave={() => setTooltip(null)}
+        >
+          <title>{label}</title>
+        </polygon>
+      );
+    }
+    return (
+      <rect
+        key={`${kind}-${task.id}`}
+        x={bx} y={barY} width={bw} height={5} rx={2}
+        fill={fill}
+        style={{ cursor: 'default' }}
+        onMouseEnter={e => { if (!dragging) setTooltip({ x: e.clientX, y: e.clientY, task, kind }); }}
+        onMouseMove={e => { if (!dragging && tooltip?.task.id === task.id && tooltip.kind === kind) setTooltip({ x: e.clientX, y: e.clientY, task, kind }); }}
+        onMouseLeave={() => setTooltip(null)}
+      >
+        <title>{label}</title>
+      </rect>
+    );
+  };
+
   return (
     <div ref={containerRef} className="timeline-container gantt-scrollbar">
       <svg ref={svgRef} width={totalWidth} height={totalHeight + rowHeight * 2} style={{ userSelect: 'none' }}>
