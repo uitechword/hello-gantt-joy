@@ -275,8 +275,11 @@ export function TimelineChart({
             const x = dateToX(task.start);
             const width = Math.max(dateToX(task.end) - x, dayWidth * 0.5);
             const y = idx * rowHeight;
-            const barHeight = task.hasChildren ? 8 : 20;
-            const barY = y + (rowHeight - barHeight) / 2;
+            // Three stacked slots per row: Planned (top, primary), Baseline (middle), Actual (bottom)
+            const barHeight = task.hasChildren ? 6 : 12;
+            const barY = y + 3;
+            const baselineY = y + rowHeight - 14;
+            const actualY = y + rowHeight - 7;
             const isSelected = selectedTaskIds.has(task.id);
             const cpm = cpmResults.get(task.id);
             const isCritical = showCriticalPath && (cpm?.isCritical ?? false);
