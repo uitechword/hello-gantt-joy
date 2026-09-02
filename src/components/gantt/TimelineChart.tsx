@@ -26,11 +26,15 @@ export function TimelineChart({
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState<{ taskId: number; mode: 'move' | 'resize'; startX: number; origStart: Date; origEnd: Date } | null>(null);
-  const [tooltip, setTooltip] = useState<{ x: number; y: number; task: FlatTask } | null>(null);
+  const [tooltip, setTooltip] = useState<{ x: number; y: number; task: FlatTask; kind: 'planned' | 'baseline' | 'actual' } | null>(null);
 
   const visibleTasks = tasks.filter(t => t.visible);
 
-  const allDates = visibleTasks.flatMap(t => [t.start, t.end]);
+  const isValidDate = (d: Date | null | undefined): d is Date => d instanceof Date && !isNaN(d.getTime());
+
+  const allDates = visibleTasks.flatMap(t =>
+    [t.start, t.end, t.baselineStart, t.baselineEnd, t.actualStart, t.actualEnd].filter(isValidDate)
+  );
   if (allDates.length === 0) return <div className="timeline-container" />;
 
   const minDate = new Date(Math.min(...allDates.map(d => d.getTime())));
