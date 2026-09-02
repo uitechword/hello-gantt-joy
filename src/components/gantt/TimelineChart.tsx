@@ -394,20 +394,23 @@ export function TimelineChart({
           </div>
           <div className="gantt-tooltip-row">
             <span className="gantt-tooltip-label">Duration:</span>
-            <span>{getDuration(tooltip.task.start, tooltip.task.end)}d</span>
+            <span>{isValidDate(tipStart) && isValidDate(tipEnd) ? `${getDuration(tipStart, tipEnd)}d` : '—'}</span>
           </div>
-          <div className="gantt-tooltip-row">
-            <span className="gantt-tooltip-label">Progress:</span>
-            <span>{tooltip.task.progress}%</span>
-          </div>
-          {tooltip.task.resources.length > 0 && (
+          {tooltip.kind === 'planned' && (
+            <div className="gantt-tooltip-row">
+              <span className="gantt-tooltip-label">Progress:</span>
+              <span>{tooltip.task.progress}%</span>
+            </div>
+          )}
+          {tooltip.kind === 'planned' && tooltip.task.resources.length > 0 && (
             <div className="gantt-tooltip-row">
               <span className="gantt-tooltip-label">Resources:</span>
               <span>{tooltip.task.resources.map(rid => resources.find(r => r.id === rid)?.name || rid).join(', ')}</span>
             </div>
           )}
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
