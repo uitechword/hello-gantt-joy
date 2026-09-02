@@ -310,8 +310,8 @@ export function TimelineChart({
                   onMouseDown={e => handleMouseDown(e, task.id, 'move')}
                   onClick={() => onSelectTask(task.id)}
                   onContextMenu={e => onContextMenu(e, task.id)}
-                  onMouseEnter={e => { if (!dragging) setTooltip({ x: e.clientX, y: e.clientY, task }); }}
-                  onMouseMove={e => { if (!dragging && tooltip?.task.id === task.id) setTooltip({ x: e.clientX, y: e.clientY, task }); }}
+                  onMouseEnter={e => { if (!dragging) setTooltip({ x: e.clientX, y: e.clientY, task, kind: 'planned' }); }}
+                  onMouseMove={e => { if (!dragging && tooltip?.task.id === task.id) setTooltip({ x: e.clientX, y: e.clientY, task, kind: 'planned' }); }}
                   onMouseLeave={() => setTooltip(null)}
                 />
                 {isCritical && (
@@ -366,6 +366,8 @@ export function TimelineChart({
                 {isSelected && (
                   <rect x={x - 1} y={barY - 1} width={width + 2} height={barHeight + 2} rx={4} fill="none" stroke="var(--ring)" strokeWidth={2} />
                 )}
+                {renderTrackingBar(task, task.baselineStart, task.baselineEnd, baselineY, 'baseline')}
+                {renderTrackingBar(task, task.actualStart, task.actualEnd, actualY, 'actual')}
               </g>
             );
           })}
