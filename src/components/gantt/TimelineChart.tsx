@@ -119,9 +119,10 @@ export function TimelineChart({
     const predIndex = visibleTasks.findIndex(t => t.id === dep.predecessorId);
     if (predIndex === -1) return null;
     const pred = visibleTasks[predIndex];
-    const halfRow = rowHeight / 2;
-    const fromY = predIndex * rowHeight + halfRow;
-    const toY = taskIndex * rowHeight + halfRow;
+    // Dependency lines connect at the vertical center of the Planned bar
+    const plannedBarH = (rowHeight - 6) / 3;
+    const fromY = predIndex * rowHeight + 2 + plannedBarH / 2;
+    const toY = taskIndex * rowHeight + 2 + plannedBarH / 2;
     const fromEnd = dep.type === 'FS' || dep.type === 'FF';
     const toEnd = dep.type === 'SF' || dep.type === 'FF';
     const fromX = fromEnd ? dateToX(pred.end) : dateToX(pred.start);
@@ -156,6 +157,7 @@ export function TimelineChart({
     start: Date | null | undefined,
     end: Date | null | undefined,
     barY: number,
+    barH: number,
     kind: 'baseline' | 'actual',
   ) => {
     if (!isValidDate(start) || !isValidDate(end) || end < start) return null;
@@ -166,7 +168,7 @@ export function TimelineChart({
     if (start.getTime() === end.getTime()) {
       // Milestone-style compact marker for zero-duration tracking dates
       const cx = bx + 3;
-      const cy = barY + 2.5;
+      const cy = barY + barH / 2;
       return (
         <polygon
           key={`${kind}-${task.id}`}
@@ -184,7 +186,7 @@ export function TimelineChart({
     return (
       <rect
         key={`${kind}-${task.id}`}
-        x={bx} y={barY} width={bw} height={5} rx={2}
+        x={bx} y={barY} width={bw} height={barH} rx={2}
         fill={fill}
         style={{ cursor: 'default' }}
         onMouseEnter={e => { if (!dragging) setTooltip({ x: e.clientX, y: e.clientY, task, kind }); }}
@@ -275,11 +277,11 @@ export function TimelineChart({
             const x = dateToX(task.start);
             const width = Math.max(dateToX(task.end) - x, dayWidth * 0.5);
             const y = idx * rowHeight;
-            // Three stacked thin bars: Planned (top), Baseline (middle), Actual (bottom)
-            const barHeight = 5;
+            // Three stacked bars: Planned (top), Baseline (middle), Actual (bottom)
+            // Layout: 2px top, bar, 1px gap, bar, 1px gap, bar, 2px bottom
+            const barHeight = (rowHeight - 6) / 3;
             const gap = 1;
-            const bundleHeight = barHeight * 3 + gap * 2;
-            const barY = y + Math.round((rowHeight - bundleHeight) / 2);
+            const barY = y + 2;
             const baselineY = barY + barHeight + gap;
             const actualY = baselineY + barHeight + gap;
             const isSelected = selectedTaskIds.has(task.id);
@@ -294,8 +296,8 @@ export function TimelineChart({
                   <rect x={x + width - 3} y={barY} width={3} height={barHeight} fill="var(--gantt-bar-parent)" />
                   <rect x={x} y={barY} width={width * (task.progress / 100)} height={barHeight} rx={1} fill="var(--gantt-bar-progress)" opacity={0.5} />
                   {isSelected && <rect x={x - 1} y={barY - 1} width={width + 2} height={barHeight + 2} rx={2} fill="none" stroke="var(--ring)" strokeWidth={2} />}
-                  {renderTrackingBar(task, task.baselineStart, task.baselineEnd, baselineY, 'baseline')}
-                  {renderTrackingBar(task, task.actualStart, task.actualEnd, actualY, 'actual')}
+                  {renderTrackingBar(task, task.baselineStart, task.baselineEnd, baselineY, barHeight, 'baseline')}
+                  {renderTrackingBar(task, task.actualStart, task.actualEnd, actualY, barHeight, 'actual')}
                 </g>
               );
             }
@@ -340,14 +342,6 @@ export function TimelineChart({
                   style={{ cursor: 'ew-resize' }}
                   onMouseDown={e => handleMouseDown(e, task.id, 'resize')}
                 />
-                {width > 60 && (
-                  <text
-                    x={x + 6} y={barY + barHeight / 2 + 4}
-                    className="timeline-task-label"
-                  >
-                    {task.name.length > width / 7 ? task.name.slice(0, Math.floor(width / 7)) + '…' : task.name}
-                  </text>
-                )}
                 {task.resources.slice(0, 2).map((rid, ri) => {
                   const r = resources.find(x => x.id === rid);
                   if (!r) return null;
@@ -368,8 +362,8 @@ export function TimelineChart({
                 {isSelected && (
                   <rect x={x - 1} y={barY - 1} width={width + 2} height={barHeight + 2} rx={4} fill="none" stroke="var(--ring)" strokeWidth={2} />
                 )}
-                {renderTrackingBar(task, task.baselineStart, task.baselineEnd, baselineY, 'baseline')}
-                {renderTrackingBar(task, task.actualStart, task.actualEnd, actualY, 'actual')}
+                {renderTrackingBar(task, task.baselineStart, task.baselineEnd, baselineY, barHeight, 'baseline')}
+                {renderTrackingBar(task, task.actualStart, task.actualEnd, actualY, barHeight, 'actual')}
               </g>
             );
           })}
