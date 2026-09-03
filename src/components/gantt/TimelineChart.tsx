@@ -296,8 +296,8 @@ export function TimelineChart({
                   <rect x={x + width - 3} y={barY} width={3} height={barHeight} fill="var(--gantt-bar-parent)" />
                   <rect x={x} y={barY} width={width * (task.progress / 100)} height={barHeight} rx={1} fill="var(--gantt-bar-progress)" opacity={0.5} />
                   {isSelected && <rect x={x - 1} y={barY - 1} width={width + 2} height={barHeight + 2} rx={2} fill="none" stroke="var(--ring)" strokeWidth={2} />}
-                  {renderTrackingBar(task, task.baselineStart, task.baselineEnd, baselineY, 'baseline')}
-                  {renderTrackingBar(task, task.actualStart, task.actualEnd, actualY, 'actual')}
+                  {renderTrackingBar(task, task.baselineStart, task.baselineEnd, baselineY, barHeight, 'baseline')}
+                  {renderTrackingBar(task, task.actualStart, task.actualEnd, actualY, barHeight, 'actual')}
                 </g>
               );
             }
@@ -362,8 +362,8 @@ export function TimelineChart({
                 {isSelected && (
                   <rect x={x - 1} y={barY - 1} width={width + 2} height={barHeight + 2} rx={4} fill="none" stroke="var(--ring)" strokeWidth={2} />
                 )}
-                {renderTrackingBar(task, task.baselineStart, task.baselineEnd, baselineY, 'baseline')}
-                {renderTrackingBar(task, task.actualStart, task.actualEnd, actualY, 'actual')}
+                {renderTrackingBar(task, task.baselineStart, task.baselineEnd, baselineY, barHeight, 'baseline')}
+                {renderTrackingBar(task, task.actualStart, task.actualEnd, actualY, barHeight, 'actual')}
               </g>
             );
           })}
