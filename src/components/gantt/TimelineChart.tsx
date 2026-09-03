@@ -277,11 +277,11 @@ export function TimelineChart({
             const x = dateToX(task.start);
             const width = Math.max(dateToX(task.end) - x, dayWidth * 0.5);
             const y = idx * rowHeight;
-            // Three stacked thin bars: Planned (top), Baseline (middle), Actual (bottom)
-            const barHeight = 5;
+            // Three stacked bars: Planned (top), Baseline (middle), Actual (bottom)
+            // Layout: 2px top, bar, 1px gap, bar, 1px gap, bar, 2px bottom
+            const barHeight = (rowHeight - 6) / 3;
             const gap = 1;
-            const bundleHeight = barHeight * 3 + gap * 2;
-            const barY = y + Math.round((rowHeight - bundleHeight) / 2);
+            const barY = y + 2;
             const baselineY = barY + barHeight + gap;
             const actualY = baselineY + barHeight + gap;
             const isSelected = selectedTaskIds.has(task.id);
@@ -342,14 +342,6 @@ export function TimelineChart({
                   style={{ cursor: 'ew-resize' }}
                   onMouseDown={e => handleMouseDown(e, task.id, 'resize')}
                 />
-                {width > 60 && (
-                  <text
-                    x={x + 6} y={barY + barHeight / 2 + 4}
-                    className="timeline-task-label"
-                  >
-                    {task.name.length > width / 7 ? task.name.slice(0, Math.floor(width / 7)) + '…' : task.name}
-                  </text>
-                )}
                 {task.resources.slice(0, 2).map((rid, ri) => {
                   const r = resources.find(x => x.id === rid);
                   if (!r) return null;
