@@ -119,9 +119,10 @@ export function TimelineChart({
     const predIndex = visibleTasks.findIndex(t => t.id === dep.predecessorId);
     if (predIndex === -1) return null;
     const pred = visibleTasks[predIndex];
-    const halfRow = rowHeight / 2;
-    const fromY = predIndex * rowHeight + halfRow;
-    const toY = taskIndex * rowHeight + halfRow;
+    // Dependency lines connect at the vertical center of the Planned bar
+    const plannedBarH = (rowHeight - 6) / 3;
+    const fromY = predIndex * rowHeight + 2 + plannedBarH / 2;
+    const toY = taskIndex * rowHeight + 2 + plannedBarH / 2;
     const fromEnd = dep.type === 'FS' || dep.type === 'FF';
     const toEnd = dep.type === 'SF' || dep.type === 'FF';
     const fromX = fromEnd ? dateToX(pred.end) : dateToX(pred.start);
@@ -156,6 +157,7 @@ export function TimelineChart({
     start: Date | null | undefined,
     end: Date | null | undefined,
     barY: number,
+    barH: number,
     kind: 'baseline' | 'actual',
   ) => {
     if (!isValidDate(start) || !isValidDate(end) || end < start) return null;
@@ -166,7 +168,7 @@ export function TimelineChart({
     if (start.getTime() === end.getTime()) {
       // Milestone-style compact marker for zero-duration tracking dates
       const cx = bx + 3;
-      const cy = barY + 2.5;
+      const cy = barY + barH / 2;
       return (
         <polygon
           key={`${kind}-${task.id}`}
@@ -184,7 +186,7 @@ export function TimelineChart({
     return (
       <rect
         key={`${kind}-${task.id}`}
-        x={bx} y={barY} width={bw} height={5} rx={2}
+        x={bx} y={barY} width={bw} height={barH} rx={2}
         fill={fill}
         style={{ cursor: 'default' }}
         onMouseEnter={e => { if (!dragging) setTooltip({ x: e.clientX, y: e.clientY, task, kind }); }}
