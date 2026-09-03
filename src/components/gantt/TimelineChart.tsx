@@ -275,11 +275,13 @@ export function TimelineChart({
             const x = dateToX(task.start);
             const width = Math.max(dateToX(task.end) - x, dayWidth * 0.5);
             const y = idx * rowHeight;
-            // Three stacked slots per row: Planned (top, primary), Baseline (middle), Actual (bottom)
-            const barHeight = task.hasChildren ? 6 : 12;
-            const barY = y + 3;
-            const baselineY = y + rowHeight - 14;
-            const actualY = y + rowHeight - 7;
+            // Three stacked thin bars: Planned (top), Baseline (middle), Actual (bottom)
+            const barHeight = 5;
+            const gap = 1;
+            const bundleHeight = barHeight * 3 + gap * 2;
+            const barY = y + Math.round((rowHeight - bundleHeight) / 2);
+            const baselineY = barY + barHeight + gap;
+            const actualY = baselineY + barHeight + gap;
             const isSelected = selectedTaskIds.has(task.id);
             const cpm = cpmResults.get(task.id);
             const isCritical = showCriticalPath && (cpm?.isCritical ?? false);
@@ -288,8 +290,8 @@ export function TimelineChart({
               return (
                 <g key={task.id} onClick={() => onSelectTask(task.id)} style={{ cursor: 'pointer' }}>
                   <rect x={x} y={barY} width={width} height={barHeight} rx={1} fill="var(--gantt-bar-parent)" opacity={0.8} />
-                  <rect x={x} y={barY} width={3} height={barHeight + 4} fill="var(--gantt-bar-parent)" />
-                  <rect x={x + width - 3} y={barY} width={3} height={barHeight + 4} fill="var(--gantt-bar-parent)" />
+                  <rect x={x} y={barY} width={3} height={barHeight} fill="var(--gantt-bar-parent)" />
+                  <rect x={x + width - 3} y={barY} width={3} height={barHeight} fill="var(--gantt-bar-parent)" />
                   <rect x={x} y={barY} width={width * (task.progress / 100)} height={barHeight} rx={1} fill="var(--gantt-bar-progress)" opacity={0.5} />
                   {isSelected && <rect x={x - 1} y={barY - 1} width={width + 2} height={barHeight + 2} rx={2} fill="none" stroke="var(--ring)" strokeWidth={2} />}
                   {renderTrackingBar(task, task.baselineStart, task.baselineEnd, baselineY, 'baseline')}
