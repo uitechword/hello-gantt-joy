@@ -29,7 +29,7 @@ export default function GanttCrudButton({ tasks, resources }) {
   return (
     <>
       <button className="gcv-btn" onClick={() => setOpen(true)}>
-        By CRUD
+        CRUD Data
       </button>
       {open && (
         <GanttCrudPage
